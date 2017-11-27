@@ -1,22 +1,31 @@
 package falcona
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
-func BenchmarkSlowcount(b *testing.B) {
+func BenchmarkPop(b *testing.B) {
 	var bb uint64
+	var ind int
+	var news uint64
 	bb = 0
-
 	for n := 0; n < b.N; n++ {
 		bb++
-		Slowcount(bb)
+		ind, news = Pop(bb)
+	}
+	if ind == 0 {
+		if news == 0 {
+			fmt.Println("WEHUJ")
+		}
 	}
 }
 
-func BenchmarkFastcount(b *testing.B) {
+func BenchmarkPopSlow(b *testing.B) {
 	var bb uint64
 	bb = 0
 	for n := 0; n < b.N; n++ {
 		bb++
-		Fastcount(bb)
+		_ = PopSlow(&bb)
 	}
 }
