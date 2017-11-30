@@ -24,3 +24,15 @@ func Scanreverse(bb uint64) int {
 func Pop(bb uint64) (uint64, int) {
 	return bb & (bb - 1), Scanforward(bb)
 }
+
+func sample(bb uint64, index int) (mask uint64) {
+	count := Count(bb)
+	for i := 0; i < count; i++ {
+		popped := (bb & (bb - 1)) ^ bb
+		bb &= bb - 1
+		if (1<<uint(i))&index != 0 {
+			mask |= popped
+		}
+	}
+	return mask
+}
