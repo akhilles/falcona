@@ -21,8 +21,12 @@ func Scanreverse(bb uint64) int {
 	return bits.TrailingZeros64(bb)
 }
 
-func Pop(bb uint64) (uint64, int) {
+func pop(bb uint64) (uint64, int) {
 	return bb & (bb - 1), Scanforward(bb)
+}
+
+func set(bb uint64, index int) uint64 {
+	return bb | (1 << uint(index))
 }
 
 func sample(bb uint64, index int) (mask uint64) {

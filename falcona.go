@@ -11,4 +11,7 @@ type Magic struct {
 
 func Print() {
 	fmt.Println("HELLO WORLD")
+	InitMasks()
+	InitMoves()
+	InitKeys()
 }

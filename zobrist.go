@@ -213,4 +213,7 @@ var keyEnpassant = [8]uint64{
 	0x67A34DAC4356550B,
 }
 
-const keyWhite = 0xF8D626AAAF278509
+var keyColor = [2]uint64{
+	0xF8D626AAAF278509,
+	0x0000000000000000,
+}
