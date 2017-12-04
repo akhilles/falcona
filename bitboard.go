@@ -1,6 +1,10 @@
 package falcona
 
-import "math/bits"
+import (
+	"bytes"
+	"fmt"
+	"math/bits"
+)
 
 func Slowcount(bb uint64) int {
 	bb -= (bb >> 1) & 0x5555555555555555
@@ -39,4 +43,24 @@ func sample(bb uint64, index int) (mask uint64) {
 		}
 	}
 	return mask
+}
+
+func print(bb uint64) {
+	buffer := bytes.NewBufferString("")
+	//buffer.WriteString(fmt.Sprintf("0x%016X\n", bb))
+	for row := 7; row >= 0; row-- {
+		buffer.WriteByte('1' + byte(row))
+		for col := 0; col <= 7; col++ {
+			offset := row<<3 + col
+			buffer.WriteByte(' ')
+			if bb&(1<<uint(offset)) != 0 {
+				buffer.WriteString("\u2022") // Set
+			} else {
+				buffer.WriteString("\u22C5") // Clear
+			}
+		}
+		buffer.WriteByte('\n')
+	}
+	buffer.WriteString("  a b c d e f g h  \n")
+	fmt.Println(buffer.String())
 }
