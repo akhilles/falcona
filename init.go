@@ -140,7 +140,17 @@ func InitMoves() {
 		// Knight and king moves
 		for j := A1; j <= H8; j++ {
 			r1, c1 := toRowCol(j)
-			
+
+			if i == j {
+				continue
+			}
+			if (abs(r-r1) == 1 && abs(c-c1) == 2) || (abs(r-r1) == 2 && abs(c-c1) == 1) {
+				knightMoves[i] = set(knightMoves[i], j)
+			}
+			if abs(r-r1) < 2 && abs(c-c1) < 2 {
+				kingMoves[i] = set(kingMoves[i], j)
+			}
 		}
+		print(knightMoves[i])
 	}
 }
