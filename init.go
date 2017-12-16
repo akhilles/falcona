@@ -101,11 +101,11 @@ func InitMoves() {
 		// Rook moves
 		rookBlockers := rookMagic[i].mask
 		for _, maskElement := range toTrim {
-			if Count(rookBlockers&maskElement) <= 1 {
+			if count(rookBlockers&maskElement) <= 1 {
 				rookBlockers &= ^maskElement
 			}
 		}
-		numCombinations := 1 << uint(Count(rookBlockers))
+		numCombinations := 1 << uint(count(rookBlockers))
 		for j := 0; j < numCombinations; j++ {
 			mask := sample(rookBlockers, j)
 			index := (mask * rookMagic[i].magic) >> 52
@@ -117,7 +117,7 @@ func InitMoves() {
 		for _, maskElement := range toTrim {
 			bishopBlockers &= ^maskElement
 		}
-		numCombinations = 1 << uint(Count(bishopBlockers))
+		numCombinations = 1 << uint(count(bishopBlockers))
 		for j := 0; j < numCombinations; j++ {
 			mask := sample(bishopBlockers, j)
 			index := (mask * bishopMagic[i].magic) >> 55
@@ -151,6 +151,6 @@ func InitMoves() {
 				kingMoves[i] = set(kingMoves[i], j)
 			}
 		}
-		print(knightMoves[i])
+		//print(knightMoves[i])
 	}
 }

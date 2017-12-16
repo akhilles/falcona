@@ -1,5 +1,22 @@
 package falcona
 
+func getPoskey(pos *Position) (poskey uint64) {
+	var sq int
+	for piece, bb := range pos.pieces {
+		for bb != 0 {
+			bb, sq = pop(bb)
+			poskey ^= keyPieces[piece*64+sq]
+		}
+	}
+	poskey ^= keyCastleSimple[pos.castles]
+	if pos.enpassant != 0 {
+		poskey ^= keyEnpassant[pos.enpassant&7]
+	}
+	poskey ^= keyColor[pos.side]
+
+	return poskey
+}
+
 var keyPieces = [768]uint64{
 	0x9D39247E33776D41, 0x2AF7398005AAA5C7, 0x44DB015024623547, 0x9C15F73E62A76AE2,
 	0x75834465489C0C89, 0x3290AC3A203001BF, 0x0FBBAD1F61042279, 0xE83A908FF2FB60CA,
