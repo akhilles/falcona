@@ -1,7 +1,6 @@
 package falcona
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
 )
@@ -31,7 +30,7 @@ type Board struct {
 }
 
 func (board *Board) initStandard() {
-	board.initFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPP/RNBQKBNR w KQkq - 0 1")
+	board.initFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
 }
 
 func (board *Board) initFEN(fen string) {
@@ -126,41 +125,4 @@ func (pos *Position) findPiece(sq uint) uint8 {
 		}
 	}
 	return 12
-}
-
-func (pos *Position) print() {
-	pieceChars := []string{"p", "P", "k", "K", "b", "B", "r", "R", "q", "Q", "k", "K", "\u22C5"}
-	for row := 7; row >= 0; row-- {
-		fmt.Println()
-		fmt.Print(1 + row)
-		for col := 0; col <= 7; col++ {
-			piece := pos.findPiece(uint(toSquare(row, col)))
-			fmt.Print(" " + pieceChars[piece])
-		}
-	}
-	fmt.Println()
-	fmt.Println("  a b c d e f g h")
-	fmt.Println()
-
-	if pos.side == White {
-		fmt.Println("side:    WHITE")
-	} else {
-		fmt.Println("side:    BLACK")
-	}
-	fmt.Print("castles: ")
-	if pos.castles&1 != 0 {
-		fmt.Print("K")
-	}
-	if pos.castles&2 != 0 {
-		fmt.Print("Q")
-	}
-	if pos.castles&4 != 0 {
-		fmt.Print("k")
-	}
-	if pos.castles&8 != 0 {
-		fmt.Print("q")
-	}
-	fmt.Println()
-	fmt.Println("ep:      " + strconv.Itoa(int(pos.enpassant)))
-	fmt.Printf("poskey:  %x\n\n", pos.poskey)
 }

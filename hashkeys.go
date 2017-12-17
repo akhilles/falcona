@@ -9,7 +9,7 @@ func getPoskey(pos *Position) (poskey uint64) {
 		}
 	}
 	poskey ^= keyCastleSimple[pos.castles]
-	if pos.enpassant != 0 {
+	if pos.enpassant != 64 {
 		poskey ^= keyEnpassant[pos.enpassant&7]
 	}
 	poskey ^= keyColor[pos.side]

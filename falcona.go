@@ -12,6 +12,10 @@ func Print() {
 
 	board := Board{}
 	board.initStandard()
-	board.pos[0].print()
 
+	pos := board.pos[0]
+
+	pos.print()
+
+	pos.generateMoves().print()
 }

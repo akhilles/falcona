@@ -26,7 +26,7 @@ func scanreverse(bb uint64) int {
 }
 
 func pop(bb uint64) (uint64, int) {
-	return bb & (bb - 1), scanforward(bb)
+	return bb & (bb - 1), scanreverse(bb)
 }
 
 func set(bb uint64, index int) uint64 {
