@@ -105,6 +105,7 @@ func (m *Move) print() {
 
 func (ml *MoveList) print() {
 	for i := 0; i < ml.count; i++ {
+		fmt.Print(i+1, " - ")
 		ml.moves[i].print()
 	}
 }

@@ -2,13 +2,10 @@ package falcona
 
 // Limits
 const (
-	MaxPly        = 64
-	MaxDepth      = 64
-	MaxMoves      = 1024
-	Checkmate     = 0x7FFF - 1 // = 32,766
-	DrawScore     = 0
-	ExistingScore = -1
-	Unknown       = 0x7FFF // = math.MaxInt16 = 32,767
+	MaxPly    = 64
+	MaxDepth  = 64
+	MaxMoves  = 1024
+	Checkmate = 0x7FFF - 1 // = 32,766
 )
 
 // Game state

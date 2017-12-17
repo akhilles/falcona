@@ -25,8 +25,7 @@ type Board struct {
 	killers [2][MaxPly]uint32
 	history [12][64]uint32
 
-	ply    int
-	hisply int
+	ply int
 }
 
 func (board *Board) initStandard() {
@@ -34,11 +33,10 @@ func (board *Board) initStandard() {
 }
 
 func (board *Board) initFEN(fen string) {
-	board.hisply = 0
 	board.ply = 0
 
-	board.pos[board.hisply] = Position{}
-	pos := &board.pos[board.hisply]
+	board.pos[board.ply] = Position{}
+	pos := &board.pos[board.ply]
 
 	substrings := strings.Split(fen, " ")
 

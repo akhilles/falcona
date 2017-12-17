@@ -13,9 +13,10 @@ func Print() {
 	board := Board{}
 	board.initStandard()
 
-	pos := board.pos[0]
+	board.pos[0].print()
+	ml := board.pos[0].generateMoves()
+	board.makeMove(ml.moves[0].move)
+	board.pos[1].print()
 
-	pos.print()
-
-	pos.generateMoves().print()
+	//pos.generateMoves().print()
 }

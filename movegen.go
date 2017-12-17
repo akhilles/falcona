@@ -107,8 +107,8 @@ func (pos *Position) castleMoves(ml *MoveList) {
 func (pos *Position) whitePawnMoves(ml *MoveList) {
 	var from, to int
 
-	forward2 := (pos.pieces[WhitePawn] << 16) & ^pos.occ
 	forward1 := (pos.pieces[WhitePawn] << 8) & ^pos.occ
+	forward2 := ((forward1 & maskRank[R3]) << 8) & ^pos.occ
 	rightCapture := (pos.pieces[WhitePawn] << 9) & (pos.colors[pos.side^1] | (1 << pos.enpassant)) & ^maskFile[FA]
 	leftCapture := (pos.pieces[WhitePawn] << 7) & (pos.colors[pos.side^1] | (1 << pos.enpassant)) & ^maskFile[FH]
 
@@ -171,8 +171,8 @@ func (pos *Position) whitePawnMoves(ml *MoveList) {
 func (pos *Position) blackPawnMoves(ml *MoveList) {
 	var from, to int
 
-	forward2 := (pos.pieces[BlackPawn] >> 16) & ^pos.occ
 	forward1 := (pos.pieces[BlackPawn] >> 8) & ^pos.occ
+	forward2 := ((forward1 & maskRank[R6]) >> 8) & ^pos.occ
 	rightCapture := (pos.pieces[BlackPawn] >> 7) & (pos.colors[pos.side^1] | (1 << pos.enpassant)) & ^maskFile[FA]
 	leftCapture := (pos.pieces[BlackPawn] >> 9) & (pos.colors[pos.side^1] | (1 << pos.enpassant)) & ^maskFile[FH]
 
