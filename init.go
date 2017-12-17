@@ -125,17 +125,23 @@ func InitMoves() {
 		}
 
 		// Pawn attacks
-		if r > R1 && r < R8 {
-			if c > FA {
+		if c > FA {
+			if r < R8 {
 				pawnAttacks[White][i] = set(pawnAttacks[White][i], i+7)
+			}
+			if r > R1 {
 				pawnAttacks[Black][i] = set(pawnAttacks[Black][i], i-9)
 			}
-			if c < FH {
+		}
+		if c < FH {
+			if r < R8 {
 				pawnAttacks[White][i] = set(pawnAttacks[White][i], i+9)
+			}
+			if r > R1 {
 				pawnAttacks[Black][i] = set(pawnAttacks[Black][i], i-7)
 			}
 		}
-		//fmt.Printf("%2d %016X %016X\n", i, pawnAttacks[White][i], pawnAttacks[Black][i])
+		//print(pawnAttacks[White][i])
 
 		// Knight and king moves
 		for j := A1; j <= H8; j++ {

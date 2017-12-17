@@ -1,13 +1,13 @@
 package falcona
 
 import (
-	"bytes"
 	"fmt"
 	"strconv"
 	"strings"
 )
 
 type Position struct {
+	occ    uint64
 	pieces [12]uint64
 	colors [2]uint64
 	kings  [2]uint8
@@ -23,8 +23,15 @@ type Position struct {
 type Board struct {
 	pos [MaxMoves]Position
 
+	killers [2][MaxPly]uint32
+	history [12][64]uint32
+
 	ply    int
 	hisply int
+}
+
+func (board *Board) initStandard() {
+	board.initFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPP/RNBQKBNR w KQkq - 0 1")
 }
 
 func (board *Board) initFEN(fen string) {
@@ -74,6 +81,7 @@ func (board *Board) initFEN(fen string) {
 		if piece < 12 {
 			pos.pieces[piece] = set(pos.pieces[piece], sq)
 			pos.colors[color(piece)] = set(pos.colors[color(piece)], sq)
+			pos.occ = set(pos.occ, sq)
 			sq++
 		}
 	}
@@ -122,37 +130,37 @@ func (pos *Position) findPiece(sq uint) uint8 {
 
 func (pos *Position) print() {
 	pieceChars := []string{"p", "P", "k", "K", "b", "B", "r", "R", "q", "Q", "k", "K", "\u22C5"}
-	buffer := bytes.NewBufferString("")
 	for row := 7; row >= 0; row-- {
-		buffer.WriteByte('1' + byte(row))
+		fmt.Println()
+		fmt.Print(1 + row)
 		for col := 0; col <= 7; col++ {
 			piece := pos.findPiece(uint(toSquare(row, col)))
-			buffer.WriteByte(' ')
-			buffer.WriteString(pieceChars[piece])
+			fmt.Print(" " + pieceChars[piece])
 		}
-		buffer.WriteByte('\n')
 	}
-	buffer.WriteString("  a b c d e f g h  \n")
+	fmt.Println()
+	fmt.Println("  a b c d e f g h")
+	fmt.Println()
 
 	if pos.side == White {
-		buffer.WriteString("WHITE to move\n")
+		fmt.Println("side:    WHITE")
 	} else {
-		buffer.WriteString("BLACK to move\n")
+		fmt.Println("side:    BLACK")
 	}
-
+	fmt.Print("castles: ")
 	if pos.castles&1 != 0 {
-		buffer.WriteByte('K')
+		fmt.Print("K")
 	}
 	if pos.castles&2 != 0 {
-		buffer.WriteByte('Q')
+		fmt.Print("Q")
 	}
 	if pos.castles&4 != 0 {
-		buffer.WriteByte('k')
+		fmt.Print("k")
 	}
 	if pos.castles&8 != 0 {
-		buffer.WriteByte('q')
+		fmt.Print("q")
 	}
-	buffer.WriteString(", ep:" + strconv.Itoa(int(pos.enpassant)) + "\n")
-
-	fmt.Println(buffer.String())
+	fmt.Println()
+	fmt.Println("ep:      " + strconv.Itoa(int(pos.enpassant)))
+	fmt.Printf("poskey:  %x\n\n", pos.poskey)
 }

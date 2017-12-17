@@ -40,6 +40,10 @@ const (
 	WhiteKing
 )
 
+var pieceValue = [12]int{
+	100, 100, 408, 408, 418, 418, 635, 635, 1260, 1260, 10000, 10000,
+}
+
 // Color
 const (
 	White = 0
