@@ -1,6 +1,6 @@
 package falcona
 
-func getPoskey(pos *Position) (poskey uint64) {
+func (pos *Position) getPoskey() (poskey uint64) {
 	var sq int
 	for piece, bb := range pos.pieces {
 		for bb != 0 {

@@ -1,0 +1,77 @@
+[Settings]
+TournamentName=tourn.at
+Type=0
+CurrSwissRound=0
+Rounds=40
+CurrentPair=1
+CurrentRound=31
+Level=5 -1\2/-1#2@-1|2
+[Options]
+QuitAfterTournament=0
+ShutDownAfterTournament=0
+RestartEngines=0
+RepeatStartPosition=1
+Startposition=2
+Variant=0
+StartPGNEPD=C:\Users\akhil\Downloads\silversuite.pgn
+Resign=1
+ResignValue=-900
+MaxGameLength=250
+EarlyDrawFromMove=9999
+TablebaseDraw=0
+Autoflag=1
+Ponder=0
+AutoRotateInGautlet=1
+RutschSystem=1
+RestartArenaAfterGamesValue=20
+RestartArenaAtHour1=0
+RestartArenaAtHourValue=2
+ShutdownComputerAfterGames1=0
+ShutdownComputerAfterGamesValue=10
+[Save]
+SaveGamesPGN=1
+SaveIncompleteGamesPGN=0
+PGNFile=C:\Program Files (x86)\Arena\Arena.pgn
+Protocolfile=Logfile001.log
+TurTabTextfile=C:\Program Files (x86)\Arena\Tournaments\Arena.txt
+TurTabHTMLfile=C:\Program Files (x86)\Arena\Tournaments\Arena.html
+SaveTurTabText=1
+SaveTurTabHTML=1
+HTMLuseCountry=0
+HTMLuseFlags=0
+HTMLuseEnglish=0
+HTMLshortResults=0
+HTMLonlyPoints=0
+HTMLFlagsFromWebsite=0
+HTMLshowPGNfilename=1
+HTMLshowBenchmark=0
+PGNwebsite=
+HTMLWinPercent=0
+HTMLStartELO=0
+HTMLShowConditions=0
+HTMLConditions=
+HTMLTopLineColorized=0
+HTMLTableTopLineColor=6737151
+SaveGamesFCH=0
+FCHdir=
+FCHnames=
+[Data]
+LastPGNEPDindex=23
+LastGameDate=2017.12.18
+LastGameTime=13:23:54
+Country=United States
+Site=DESKTOP-UVTE6F0
+Hardware=Intel(R) Core(TM) i7-4510U CPU @ 2.00GHz with 7.9 GB Memory
+OS=Windows 10 Home Home Edition (Build 9200) 64 bit
+Website=
+E-Mail=
+ArenaVersion=Arena 3.5.1
+FirstGameDate=2017.12.18
+FirstGameTime=11:56:35
+[PairingLastPGNEPDindex]
+Falcona 1-1 ------ Falcona 1-4=23
+[PairingResults]
+Falcona 1-1 ------ Falcona 1-4=00½000001½00111½01½½10010101000
+[Participants]
+Engine1=Falcona 1-1
+Engine2=Falcona 1-4

@@ -1,15 +1,18 @@
 package falcona
 
+import "os"
+import "fmt"
+
 func (pos *Position) flipPiece(sq uint8, piece uint8) {
 	pos.pieces[piece] ^= (1 << sq)
 	pos.colors[color(piece)] ^= (1 << sq)
-	pos.poskey ^= keyPieces[piece*64+sq]
+	pos.poskey ^= keyPieces[int(piece)*64+int(sq)]
 }
 
 func (pos *Position) movePiece(from, to uint8, piece uint8) {
 	pos.pieces[piece] ^= ((1 << from) | (1 << to))
 	pos.colors[color(piece)] ^= ((1 << from) | (1 << to))
-	pos.poskey ^= keyPieces[piece*64+from] ^ keyPieces[piece*64+to]
+	pos.poskey ^= keyPieces[int(piece)*64+int(from)] ^ keyPieces[int(piece)*64+int(to)]
 }
 
 func (board *Board) makeMove(move uint32) bool {
@@ -82,10 +85,19 @@ func (board *Board) makeMove(move uint32) bool {
 	pos.side ^= 1
 
 	if pos.attackedBy(int(pos.kings[pos.side^1]), pos.side) {
-		if board.ply > 0 {
-			board.ply--
-		}
+		board.ply--
 		return false
 	}
+
+	if pos.poskey != pos.getPoskey() {
+		fmt.Println(moveToString(move), move)
+		pos.print()
+		os.Exit(3)
+	}
+
 	return true
+}
+
+func (board *Board) unmakeMove() {
+	board.ply--
 }

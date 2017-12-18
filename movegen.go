@@ -23,13 +23,26 @@ const (
 func (pos *Position) generateMoves() *MoveList {
 	ml := &MoveList{[128]Move{}, 0}
 	for piece := WhiteKnight ^ pos.side; piece <= WhiteKing; piece += 2 {
-		pos.pieceMoves(ml, piece)
+		pos.pieceMoves(ml, piece, false)
 	}
 	pos.castleMoves(ml)
 	if pos.side == White {
-		pos.whitePawnMoves(ml)
+		pos.whitePawnMoves(ml, false)
 	} else {
-		pos.blackPawnMoves(ml)
+		pos.blackPawnMoves(ml, false)
+	}
+	return ml
+}
+
+func (pos *Position) generateCaptures() *MoveList {
+	ml := &MoveList{[128]Move{}, 0}
+	for piece := WhiteKnight ^ pos.side; piece <= WhiteKing; piece += 2 {
+		pos.pieceMoves(ml, piece, true)
+	}
+	if pos.side == White {
+		pos.whitePawnMoves(ml, true)
+	} else {
+		pos.blackPawnMoves(ml, true)
 	}
 	return ml
 }
@@ -64,32 +77,35 @@ func newMove(from, to int, piece, captured, promoted uint8, flags uint32) uint32
 
 func (ml *MoveList) addQuietMove(from, to int, piece, promoted uint8, flags uint32) {
 	move := newMove(from, to, piece, 0xF, promoted, flags)
-	ml.moves[ml.count] = Move{move, 3}
+	ml.moves[ml.count] = Move{move, 10}
 	ml.count++
 }
 
 func (ml *MoveList) addCaptureMove(from, to int, piece, captured, promoted uint8, flags uint32) {
 	move := newMove(from, to, piece, captured, promoted, flags)
-	ml.moves[ml.count] = Move{move, 3}
+	score := pieceValue[captured] - pieceValue[piece] + 100000
+	ml.moves[ml.count] = Move{move, score}
 	ml.count++
 }
 
-func (pos *Position) pieceMoves(ml *MoveList, piece uint8) {
+func (pos *Position) pieceMoves(ml *MoveList, piece uint8, onlyCaptures bool) {
 	pieces := pos.pieces[piece]
 	var from, to int
 	for pieces != 0 {
 		pieces, from = pop(pieces)
 		targets := targetFns[(piece>>1)-1](from, pos.occ)
 		captures := targets & pos.colors[pos.side^1]
-		targets = targets & ^(pos.occ)
 		for captures != 0 {
 			captures, to = pop(captures)
 			captured := pos.findPiece(uint(to))
 			ml.addCaptureMove(from, to, piece, captured, 0xF, 0)
 		}
-		for targets != 0 {
-			targets, to = pop(targets)
-			ml.addQuietMove(from, to, piece, 0xF, 0)
+		if !onlyCaptures {
+			targets = targets & ^(pos.occ)
+			for targets != 0 {
+				targets, to = pop(targets)
+				ml.addQuietMove(from, to, piece, 0xF, 0)
+			}
 		}
 	}
 }
@@ -97,14 +113,30 @@ func (pos *Position) pieceMoves(ml *MoveList, piece uint8) {
 func (pos *Position) castleMoves(ml *MoveList) {
 	from := pos.kings[pos.side]
 	if ((pos.castles & castleKingside[pos.side]) != 0) && (pos.occ&castleKingsideEmpty[pos.side] == 0) {
-		ml.addQuietMove(int(from), int(from+2), king(pos.side), 0xF, isCastle)
+		if pos.side == White {
+			if !pos.attackedBy(E1, Black) && !pos.attackedBy(F1, Black) {
+				ml.addQuietMove(int(from), int(from+2), king(pos.side), 0xF, isCastle)
+			}
+		} else {
+			if !pos.attackedBy(E8, White) && !pos.attackedBy(F8, White) {
+				ml.addQuietMove(int(from), int(from+2), king(pos.side), 0xF, isCastle)
+			}
+		}
 	}
 	if ((pos.castles & castleQueenside[pos.side]) != 0) && (pos.occ&castleQueensideEmpty[pos.side] == 0) {
-		ml.addQuietMove(int(from), int(from-3), king(pos.side), 0xF, isCastle)
+		if pos.side == White {
+			if !pos.attackedBy(E1, Black) && !pos.attackedBy(D1, Black) {
+				ml.addQuietMove(int(from), int(from-2), king(pos.side), 0xF, isCastle)
+			}
+		} else {
+			if !pos.attackedBy(E8, White) && !pos.attackedBy(D8, White) {
+				ml.addQuietMove(int(from), int(from-2), king(pos.side), 0xF, isCastle)
+			}
+		}
 	}
 }
 
-func (pos *Position) whitePawnMoves(ml *MoveList) {
+func (pos *Position) whitePawnMoves(ml *MoveList, onlyCaptures bool) {
 	var from, to int
 
 	forward1 := (pos.pieces[WhitePawn] << 8) & ^pos.occ
@@ -112,22 +144,24 @@ func (pos *Position) whitePawnMoves(ml *MoveList) {
 	rightCapture := (pos.pieces[WhitePawn] << 9) & (pos.colors[pos.side^1] | (1 << pos.enpassant)) & ^maskFile[FA]
 	leftCapture := (pos.pieces[WhitePawn] << 7) & (pos.colors[pos.side^1] | (1 << pos.enpassant)) & ^maskFile[FH]
 
-	for forward2 != 0 {
-		forward2, to = pop(forward2)
-		from = to - 16
-		ml.addQuietMove(from, to, WhitePawn, 0xF, isPawnstart)
-	}
+	if !onlyCaptures {
+		for forward2 != 0 {
+			forward2, to = pop(forward2)
+			from = to - 16
+			ml.addQuietMove(from, to, WhitePawn, 0xF, isPawnstart)
+		}
 
-	for forward1 != 0 {
-		forward1, to = pop(forward1)
-		from = to - 8
-		if to >= A8 {
-			ml.addQuietMove(from, to, WhitePawn, WhiteQueen, 0)
-			ml.addQuietMove(from, to, WhitePawn, WhiteKnight, 0)
-			ml.addQuietMove(from, to, WhitePawn, WhiteRook, 0)
-			ml.addQuietMove(from, to, WhitePawn, WhiteBishop, 0)
-		} else {
-			ml.addQuietMove(from, to, WhitePawn, 0xF, 0)
+		for forward1 != 0 {
+			forward1, to = pop(forward1)
+			from = to - 8
+			if to >= A8 || to <= H1 {
+				ml.addQuietMove(from, to, WhitePawn, WhiteQueen, 0)
+				ml.addQuietMove(from, to, WhitePawn, WhiteKnight, 0)
+				ml.addQuietMove(from, to, WhitePawn, WhiteRook, 0)
+				ml.addQuietMove(from, to, WhitePawn, WhiteBishop, 0)
+			} else {
+				ml.addQuietMove(from, to, WhitePawn, 0xF, 0)
+			}
 		}
 	}
 
@@ -168,7 +202,7 @@ func (pos *Position) whitePawnMoves(ml *MoveList) {
 	}
 }
 
-func (pos *Position) blackPawnMoves(ml *MoveList) {
+func (pos *Position) blackPawnMoves(ml *MoveList, onlyCaptures bool) {
 	var from, to int
 
 	forward1 := (pos.pieces[BlackPawn] >> 8) & ^pos.occ
@@ -176,22 +210,24 @@ func (pos *Position) blackPawnMoves(ml *MoveList) {
 	rightCapture := (pos.pieces[BlackPawn] >> 7) & (pos.colors[pos.side^1] | (1 << pos.enpassant)) & ^maskFile[FA]
 	leftCapture := (pos.pieces[BlackPawn] >> 9) & (pos.colors[pos.side^1] | (1 << pos.enpassant)) & ^maskFile[FH]
 
-	for forward2 != 0 {
-		forward2, to = pop(forward2)
-		from = to + 16
-		ml.addQuietMove(from, to, BlackPawn, 0xF, isPawnstart)
-	}
+	if !onlyCaptures {
+		for forward2 != 0 {
+			forward2, to = pop(forward2)
+			from = to + 16
+			ml.addQuietMove(from, to, BlackPawn, 0xF, isPawnstart)
+		}
 
-	for forward1 != 0 {
-		forward1, to = pop(forward1)
-		from = to + 8
-		if to >= A8 {
-			ml.addQuietMove(from, to, BlackPawn, BlackQueen, 0)
-			ml.addQuietMove(from, to, BlackPawn, BlackKnight, 0)
-			ml.addQuietMove(from, to, BlackPawn, BlackRook, 0)
-			ml.addQuietMove(from, to, BlackPawn, BlackBishop, 0)
-		} else {
-			ml.addQuietMove(from, to, BlackPawn, 0xF, 0)
+		for forward1 != 0 {
+			forward1, to = pop(forward1)
+			from = to + 8
+			if to >= A8 || to <= H1 {
+				ml.addQuietMove(from, to, BlackPawn, BlackQueen, 0)
+				ml.addQuietMove(from, to, BlackPawn, BlackKnight, 0)
+				ml.addQuietMove(from, to, BlackPawn, BlackRook, 0)
+				ml.addQuietMove(from, to, BlackPawn, BlackBishop, 0)
+			} else {
+				ml.addQuietMove(from, to, BlackPawn, 0xF, 0)
+			}
 		}
 	}
 

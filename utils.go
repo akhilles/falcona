@@ -111,7 +111,7 @@ func (ml *MoveList) print() {
 }
 
 func (pos *Position) print() {
-	pieceChars := []string{"p", "P", "n", "N", "b", "B", "r", "R", "q", "Q", "k", "K", "\u22C5"}
+	pieceChars := []string{"p", "P", "n", "N", "b", "B", "r", "R", "q", "Q", "k", "K", "", "", "", "\u22C5"}
 	for row := 7; row >= 0; row-- {
 		fmt.Println()
 		fmt.Print(1 + row)
@@ -145,4 +145,36 @@ func (pos *Position) print() {
 	fmt.Println()
 	fmt.Println("ep:      " + strconv.Itoa(int(pos.enpassant)))
 	fmt.Printf("poskey:  %x\n\n", pos.poskey)
+}
+
+func (pos *Position) moveFromString(move string) uint32 {
+	from := toSquare(int(move[1]-'1'), int(move[0]-'a'))
+	to := toSquare(int(move[3]-'1'), int(move[2]-'a'))
+	moved := pos.findPiece(uint(from))
+	captured := pos.findPiece(uint(to))
+
+	if isKing(moved) && abs(from-to) == 2 {
+		return newMove(from, to, moved, 0xF, 0xF, isCastle)
+	}
+
+	if isPawn(moved) {
+		if abs(from-to) == 16 {
+			return newMove(from, to, moved, 0xF, 0xF, isPawnstart)
+		} else if abs(from-to) != 8 && captured == 0xF {
+			return newMove(from, to, moved, moved^1, 0xF, isEnpassant)
+		} else if len(move) > 4 {
+			switch move[4] {
+			case 'q', 'Q':
+				return newMove(from, to, moved, captured, queen(pos.side), 0)
+			case 'r', 'R':
+				return newMove(from, to, moved, captured, rook(pos.side), 0)
+			case 'b', 'B':
+				return newMove(from, to, moved, captured, bishop(pos.side), 0)
+			case 'n', 'N':
+				return newMove(from, to, moved, captured, knight(pos.side), 0)
+			}
+		}
+	}
+
+	return newMove(from, to, moved, captured, 0xF, 0)
 }

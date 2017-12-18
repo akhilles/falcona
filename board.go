@@ -5,6 +5,8 @@ import (
 	"strings"
 )
 
+var table HashTable
+
 type Position struct {
 	occ    uint64
 	pieces [12]uint64
@@ -21,10 +23,6 @@ type Position struct {
 
 type Board struct {
 	pos [MaxMoves]Position
-
-	killers [2][MaxPly]uint32
-	history [12][64]uint32
-
 	ply int
 }
 
@@ -34,6 +32,7 @@ func (board *Board) initStandard() {
 
 func (board *Board) initFEN(fen string) {
 	board.ply = 0
+	table.count = 8000000
 
 	board.pos[board.ply] = Position{}
 	pos := &board.pos[board.ply]
@@ -112,7 +111,7 @@ func (board *Board) initFEN(fen string) {
 		pos.fiftymove = uint8(n)
 	}
 
-	pos.poskey = getPoskey(pos)
+	pos.poskey = pos.getPoskey()
 }
 
 func (pos *Position) findPiece(sq uint) uint8 {
@@ -122,5 +121,5 @@ func (pos *Position) findPiece(sq uint) uint8 {
 			return uint8(piece)
 		}
 	}
-	return 12
+	return 0xF
 }
